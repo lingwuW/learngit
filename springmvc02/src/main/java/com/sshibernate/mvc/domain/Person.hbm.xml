@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC 
+    "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+    "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+    <hibernate-mapping package="com.code.hibernate01.maventest06.domain">
+ 		<class name="Person" table="t_person">
+ 			<id name="id" column="id" type="integer">
+ 				<generator class="identity"></generator>
+ 			</id>
+ 			<property name="name" column="name" type="string"></property>
+ 			<property name="nation" column="nation" type="string"></property>
+ 			<!--property-ref（参考值）与注解中的mappedBy是一样的功能  -->
+ 			<one-to-one name="idCard" class="IdCard" property-ref="person" cascade="save-update,delete" ></one-to-one>
+ 		</class>
+    </hibernate-mapping>

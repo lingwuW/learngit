@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.3.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.3.xsd
+		http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-4.3.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.3.xsd">
+	
+	<!-- 上面的那些东西是spring命名空间和xml语义约束 -->
+	
+	<!-- Root Context: defines shared resources visible to all other web components -->
+	<!-- 引入 类路径下sring目录下spring-dao.xml  完成与其他组件的整合-->
+	<import resource="classpath:spring/spring-dao.xml" />
+	<!-- 引入 类路径下sring目录下spring-service.xml  完成与其他组件的整合-->
+	<import resource="classpath:spring/spring-service.xml"/>
+	
+	<!-- spring在扫描bean的时候不要扫描controller组件，它是由springMVC管理扫描的，不能重复，否则spring AOP配置失效 -->
+	<context:component-scan base-package="com.sshibernate.mvc">
+		<context:exclude-filter type="annotation" expression="org.springframework.web.bind.annotation.RestController"/>
+		<context:exclude-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
+	</context:component-scan>
+	
+	<!-- Spring AOP配置 -->
+	<!-- 启动@AspectJ支持   可以指定动态代理类型 -->
+	<aop:aspectj-autoproxy />
+	<!-- <bean class="org.springframework.aop.aspectj.annotation.AnnotationAwareAspectJAutoProxyCreator"></bean> -->
+	
+	<!-- 代理类bean，配置该bean将其纳入spring IOC容器管理   使用注解的时候，就不能再手动加载代理bean对象-->
+	<!-- <bean id="mapect" class="com.sshibernate.mvc.aop.MyAspect"></bean> -->
+	
+	<!-- 
+		proxy-target-class：指定动态代理类型
+		aop:pointcut:定义切入点  expression：切入点函数
+	 -->
+	<!-- <aop:config>
+		<aop:pointcut id="mapointcut" expression="execution(* com.sshibernate.mvc.service..*.*(..))" />
+		<aop:aspect id="mycheck" ref="mapect">
+			在目标方法之前执行
+			<aop:before method="doBefore" pointcut-ref="mapointcut"/>
+			在目标方法之后执行
+			<aop:after method="doAfter" pointcut-ref="mapointcut"/>
+			正常执行目标方法，在执行完after之后 ，就执行after-returning
+			<aop:after-returning method="doAfterReturn" pointcut-ref="mapointcut"/>
+			doBefore>目标方法执行异常>还是会执行doAfter，然后执行after-throw方法
+			<aop:after-throwing method="doAfterThrow" pointcut-ref="mapointcut"/>
+		</aop:aspect>
+	</aop:config>-->
+</beans>

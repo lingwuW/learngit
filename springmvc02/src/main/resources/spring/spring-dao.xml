@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.3.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.3.xsd
+		http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-4.3.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.3.xsd">
+	
+	<!-- 配置的都是DAO组件 -->
+	
+	<!-- 1.配置数据库相关参数properties的属性：${url} -->
+	<context:property-placeholder location="classpath:db.properties"/>
+	
+	<!-- 2.数据库连接池 这里采用c3p0数据库连接池的实现  dataSource数据源-->
+	 <bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource">
+        <!-- 配置连接池属性 -->
+        <property name="driverClass" value="${driver}" />
+        <property name="jdbcUrl" value="${url}" />
+        <property name="user" value="${user}" />
+        <property name="password" value="${password}" />
+		
+        <!-- c3p0连接池的私有属性 -->
+        <property name="initialPoolSize" value="10"></property>
+        <property name="maxPoolSize" value="30" />
+        <property name="minPoolSize" value="10" />
+        <!-- 关闭连接后不自动commit -->
+        <property name="autoCommitOnClose" value="false" />
+        <!-- 获取连接超时时间 -->
+        <property name="checkoutTimeout" value="10000" />
+        <!-- 当获取连接失败重试次数 -->
+        <property name="acquireRetryAttempts" value="2" />
+    </bean>
+	
+	<!-- 配置sessionFactory整合hibernate或者配置Mybatis的SqlSessionFactory对象 -->
+	 <bean id="sessionFactory" class="org.springframework.orm.hibernate4.LocalSessionFactoryBean" lazy-init="false">
+        <!-- 注入datasource，给sessionfactoryBean内setdatasource提供数据源 -->
+        <property name="dataSource" ref="dataSource" />
+        <property name="configLocation" value="classpath:hibernate.cfg.xml"></property>
+        	<!-- //加载实体类的映射文件位置及名称 -->
+        <!--<property name="mappingLocations" value="classpath:com/demo/ssm/po/*.hbm.xml"></property> -->
+    </bean>
+    
+    <context:component-scan base-package="com.sshibernate.mvc.dao" />
+    
+    <!-- 配置hibernate局部事务管理器 -->
+	<bean id="transactionManager"
+        class="org.springframework.orm.hibernate4.HibernateTransactionManager">
+        <property name="sessionFactory" ref="sessionFactory" /> 
+    </bean>
+    <!-- 配置hibernateTemplate模板类，但是可以不用，直接使用sessionFactory.getCurrentSession()获取session，使用spring的事务管理 -->
+    <!-- <bean id="hibernateTemplate" class="org.springframework.orm.hibernate4.HibernateTemplate">
+    	<property name="sessionFactory" ref="sessionFactory" /> 
+    </bean> -->
+	
+    <!-- 配置基于注解的spring声明式事务 -->
+    <tx:annotation-driven transaction-manager="transactionManager" />
+    
+    <!--   建立事务管理切面XML配置方法
+    
+    <tx:advice id="txAdvice" transaction-manager="transactionManager">  
+	    <tx:attributes>  
+	        <tx:method name="findUserById" propagation="REQUIRED" read-only="true" />  
+	    </tx:attributes>  
+	</tx:advice>  
+	
+	<aop:config >
+		<aop:pointcut  id="myponintcut" expression="execution(* com.sshibernate.mvc.service.*.*(..))"/>
+		<aop:advisor pointcut-ref="myponintcut" advice-ref="txAdvice" />
+	</aop:config> -->
+    
+</beans>

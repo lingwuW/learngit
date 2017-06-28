@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC 
+    "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+    "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+    <hibernate-mapping package="com.code.hibernate01.maventest06.domain">
+ 		<class name="IdCard" table="idcard_tab">
+ 			<!-- 这里的主键采用自增策略 -->
+ 			<id name="id" column="id" type="integer">
+ 				<generator class="identity"></generator>
+ 			</id>
+ 			<!-- <version name=""></version> -->
+ 			<!-- <timestamp name=""></timestamp> -->
+ 			<property name="number" column="number" type="string"></property>
+ 			<!-- 外键关联是属于多对一或一对多关联关系中采用的关联形式，在这里是一对一，每个外键都是唯一的
+ 				所以说是多对一的特例；这里采用many-to-one来配置从表 
+ 			-->
+ 			<many-to-one name="person" class="Person" column="personid" unique="true" not-null="true"></many-to-one>
+ 		</class>
+    </hibernate-mapping>
+
